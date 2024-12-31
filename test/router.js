@@ -15,8 +15,6 @@ const shouldHitHandle = utils.shouldHitHandle
 const shouldNotHaveBody = utils.shouldNotHaveBody
 const shouldNotHitHandle = utils.shouldNotHitHandle
 
-const describePromises = global.Promise ? describe : describe.skip
-
 describe('Router', function () {
   it('should return a function', function () {
     assert.equal(typeof Router(), 'function')
@@ -770,7 +768,7 @@ describe('Router', function () {
       })
     })
 
-    describePromises('promise support', function () {
+    describe('promise support', function () {
       it('should pass rejected promise value', function (_, done) {
         const router = new Router()
         const server = createServer(router)

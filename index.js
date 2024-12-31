@@ -12,7 +12,6 @@
  * @private
  */
 
-const isPromise = require('is-promise')
 const Layer = require('./lib/layer')
 const methods = require('methods')
 const parseUrl = require('parseurl')
@@ -638,10 +637,8 @@ function processParams (params, layer, called, req, res, done) {
 
     try {
       const ret = fn(req, res, paramCallback, paramVal, key)
-      if (isPromise(ret)) {
-        ret.then(null, function (error) {
-          paramCallback(error || new Error('Rejected promise'))
-        })
+      if (ret instanceof Promise) {
+        ret.catch((error = new Error('Rejected promise')) => paramCallback(error))
       }
     } catch (e) {
       paramCallback(e)
