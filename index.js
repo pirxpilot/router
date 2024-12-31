@@ -23,8 +23,6 @@ const setPrototypeOf = require('setprototypeof')
  * @private
  */
 
-const slice = Array.prototype.slice
-
 /**
  * Expose `Router`.
  */
@@ -351,8 +349,7 @@ Router.prototype.handle = function handle (req, res, callback) {
  * @public
  */
 
-Router.prototype.use = function use (handler) {
-  let offset = 0
+Router.prototype.use = function use (handler, ...args) {
   let path = '/'
 
   // default path to '/'
@@ -366,12 +363,14 @@ Router.prototype.use = function use (handler) {
 
     // first arg is the path
     if (typeof arg !== 'function') {
-      offset = 1
       path = handler
+      handler = undefined
     }
   }
-
-  const callbacks = slice.call(arguments, offset).flat(Infinity)
+  if (handler !== undefined) {
+    args.unshift(handler)
+  }
+  const callbacks = args.flat(Infinity)
 
   if (callbacks.length === 0) {
     throw new TypeError('argument handler is required')
@@ -433,9 +432,9 @@ Router.prototype.route = function route (path) {
 
 // create Router#VERB functions
 methods.concat('all').forEach(function (method) {
-  Router.prototype[method] = function (path) {
+  Router.prototype[method] = function (path, ...args) {
     const route = this.route(path)
-    route[method].apply(route, slice.call(arguments, 1))
+    route[method].apply(route, args)
     return this
   }
 })
@@ -654,14 +653,8 @@ function processParams (params, layer, called, req, res, done) {
  * @private
  */
 
-function restore (fn, obj) {
-  const props = new Array(arguments.length - 2)
-  const vals = new Array(arguments.length - 2)
-
-  for (let i = 0; i < props.length; i++) {
-    props[i] = arguments[i + 2]
-    vals[i] = obj[props[i]]
-  }
+function restore (fn, obj, ...props) {
+  const vals = props.map(prop => obj[prop])
 
   return function () {
     // restore vals
@@ -719,14 +712,7 @@ function trySendOptionsResponse (res, methods, next) {
  */
 
 function wrap (old, fn) {
-  return function proxy () {
-    const args = new Array(arguments.length + 1)
-
-    args[0] = old
-    for (let i = 0, len = arguments.length; i < len; i++) {
-      args[i + 1] = arguments[i]
-    }
-
-    fn.apply(this, args)
+  return function proxy (...args) {
+    fn.call(this, old, ...args)
   }
 }
