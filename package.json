@@ -1,7 +1,7 @@
 {
   "name": "@pirxpilot/router",
   "description": "Simple middleware-style router",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "author": "Douglas Christopher Wilson <doug@somethingdoug.com>",
   "contributors": [
     "Blake Embrey <hello@blakeembrey.com>"

@@ -1,7 +1,11 @@
-unreleased
-=========================
 
-* Drop support for node <18
+1.0.0 / 2024-12-31
+==================
+
+ * rename to @pirxpilot/router
+ * relax dependecies
+ * remove outdated and dependencies
+ * replace `mocha` and `nyc` with built-in `node:test`
 
 2.0.0-beta.2 / 2024-03-20
 =========================
