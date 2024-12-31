@@ -1,10 +1,11 @@
 const { it, describe } = require('node:test')
+const assert = require('node:assert/strict')
+
 const series = require('run-series')
 const methods = require('methods')
 const Router = require('..')
 const utils = require('./support/utils')
 
-const assert = utils.assert
 const createHitHandle = utils.createHitHandle
 const createServer = utils.createServer
 const rawrequest = utils.rawrequest
