@@ -1,6 +1,5 @@
 const { it, describe } = require('node:test')
 const assert = require('node:assert/strict')
-const series = require('run-series')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -32,7 +31,7 @@ describe('Router', function () {
       assert.throws(router.param.bind(router, 'id', 42), /argument fn must be a function/)
     })
 
-    it('should map logic for a path param', function (_, done) {
+    it('should map logic for a path param', async function () {
       const router = new Router()
       const server = createServer(router)
 
@@ -46,18 +45,12 @@ describe('Router', function () {
         res.end('get user ' + req.params.id)
       })
 
-      series([
-        function (cb) {
-          request(server)
-            .get('/user/2')
-            .expect(200, 'get user 2', cb)
-        },
-        function (cb) {
-          request(server)
-            .get('/user/bob')
-            .expect(200, 'get user NaN', cb)
-        }
-      ], done)
+      await request(server)
+        .get('/user/2')
+        .expect(200, 'get user 2')
+      await request(server)
+        .get('/user/bob')
+        .expect(200, 'get user NaN')
     })
 
     it('should allow chaining', function (_, done) {
@@ -122,7 +115,7 @@ describe('Router', function () {
         .expect(400, /URIError: Failed to decode param/, done)
     })
 
-    it('should only invoke fn when necessary', function (_, done) {
+    it('should only invoke fn when necessary', async function () {
       const router = new Router()
       const server = createServer(router)
 
@@ -138,19 +131,13 @@ describe('Router', function () {
       router.get('/user/:user', saw)
       router.put('/user/:id', saw)
 
-      series([
-        function (cb) {
-          request(server)
-            .get('/user/bob')
-            .expect(500, /Error: boom/, cb)
-        },
-        function (cb) {
-          request(server)
-            .put('/user/bob')
-            .expect('x-id', 'bob')
-            .expect(200, 'saw PUT /user/bob', cb)
-        }
-      ], done)
+      await request(server)
+        .get('/user/bob')
+        .expect(500, /Error: boom/)
+      await request(server)
+        .put('/user/bob')
+        .expect('x-id', 'bob')
+        .expect(200, 'saw PUT /user/bob')
     })
 
     it('should only invoke fn once per request', function (_, done) {
@@ -305,7 +292,7 @@ describe('Router', function () {
     })
 
     describe('next("route")', function () {
-      it('should cause route with param to be skipped', function (_, done) {
+      it('should cause route with param to be skipped', async function () {
         const router = new Router()
         const server = createServer(router)
 
@@ -331,23 +318,15 @@ describe('Router', function () {
           res.end('cannot get a new user')
         })
 
-        series([
-          function (cb) {
-            request(server)
-              .get('/user/2')
-              .expect(200, 'get user 2', cb)
-          },
-          function (cb) {
-            request(server)
-              .get('/user/bob')
-              .expect(404, cb)
-          },
-          function (cb) {
-            request(server)
-              .get('/user/new')
-              .expect(400, 'cannot get a new user', cb)
-          }
-        ], done)
+        await request(server)
+          .get('/user/2')
+          .expect(200, 'get user 2')
+        await request(server)
+          .get('/user/bob')
+          .expect(404)
+        await request(server)
+          .get('/user/new')
+          .expect(400, 'cannot get a new user')
       })
 
       it('should invoke fn if path value differs', function (_, done) {

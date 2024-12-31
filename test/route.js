@@ -1,7 +1,6 @@
 const { it, describe } = require('node:test')
 const assert = require('node:assert/strict')
 const methods = require('methods')
-const series = require('run-series')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -23,7 +22,7 @@ describe('Router', function () {
       assert.equal(route.path, '/foo')
     })
 
-    it('should respond to multiple methods', function (_, done) {
+    it('should respond to multiple methods', async function () {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -31,23 +30,15 @@ describe('Router', function () {
       route.get(saw)
       route.post(saw)
 
-      series([
-        function (cb) {
-          request(server)
-            .get('/foo')
-            .expect(200, 'saw GET /foo', cb)
-        },
-        function (cb) {
-          request(server)
-            .post('/foo')
-            .expect(200, 'saw POST /foo', cb)
-        },
-        function (cb) {
-          request(server)
-            .put('/foo')
-            .expect(404, cb)
-        }
-      ], done)
+      await request(server)
+        .get('/foo')
+        .expect(200, 'saw GET /foo')
+      await request(server)
+        .post('/foo')
+        .expect(200, 'saw POST /foo')
+      await request(server)
+        .put('/foo')
+        .expect(404)
     })
 
     it('should route without method', function (_, done) {
@@ -74,7 +65,7 @@ describe('Router', function () {
         .expect(200, 'saw undefined /foo', done)
     })
 
-    it('should stack', function (_, done) {
+    it('should stack', async function () {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -85,49 +76,35 @@ describe('Router', function () {
 
       router.use(saw)
 
-      series([
-        function (cb) {
-          request(server)
-            .get('/foo')
-            .expect('x-fn-2', 'hit')
-            .expect('x-fn-3', 'hit')
-            .expect(200, 'saw GET /foo', cb)
-        },
-        function (cb) {
-          request(server)
-            .post('/foo')
-            .expect('x-fn-1', 'hit')
-            .expect('x-fn-2', 'hit')
-            .expect(200, 'saw POST /foo', cb)
-        },
-        function (cb) {
-          request(server)
-            .put('/foo')
-            .expect('x-fn-2', 'hit')
-            .expect(200, 'saw PUT /foo', cb)
-        }
-      ], done)
+      await request(server)
+        .get('/foo')
+        .expect('x-fn-2', 'hit')
+        .expect('x-fn-3', 'hit')
+        .expect(200, 'saw GET /foo')
+      await request(server)
+        .post('/foo')
+        .expect('x-fn-1', 'hit')
+        .expect('x-fn-2', 'hit')
+        .expect(200, 'saw POST /foo')
+      await request(server)
+        .put('/foo')
+        .expect('x-fn-2', 'hit')
+        .expect(200, 'saw PUT /foo')
     })
 
-    it('should not error on empty route', function (_, done) {
+    it('should not error on empty route', async function () {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
 
       assert.ok(route)
 
-      series([
-        function (cb) {
-          request(server)
-            .get('/foo')
-            .expect(404, cb)
-        },
-        function (cb) {
-          request(server)
-            .head('/foo')
-            .expect(404, cb)
-        }
-      ], done)
+      await request(server)
+        .get('/foo')
+        .expect(404)
+      await request(server)
+        .head('/foo')
+        .expect(404)
     })
 
     it('should not invoke singular error route', function (_, done) {
@@ -181,30 +158,22 @@ describe('Router', function () {
         assert.throws(route.all.bind(route, 2), /argument handler must be a function/)
       })
 
-      it('should respond to all methods', function (_, done) {
+      it('should respond to all methods', async function () {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
 
         route.all(saw)
 
-        series([
-          function (cb) {
-            request(server)
-              .get('/foo')
-              .expect(200, 'saw GET /foo', cb)
-          },
-          function (cb) {
-            request(server)
-              .post('/foo')
-              .expect(200, 'saw POST /foo', cb)
-          },
-          function (cb) {
-            request(server)
-              .put('/foo')
-              .expect(200, 'saw PUT /foo', cb)
-          }
-        ], done)
+        await request(server)
+          .get('/foo')
+          .expect(200, 'saw GET /foo')
+        await request(server)
+          .post('/foo')
+          .expect(200, 'saw POST /foo')
+        await request(server)
+          .put('/foo')
+          .expect(200, 'saw PUT /foo')
       })
 
       it('should accept multiple arguments', function (_, done) {
@@ -727,163 +696,117 @@ describe('Router', function () {
             .expect(200, { user: 'tj', op: 'edit' }, done)
         })
 
-        it('should work within arrays', function (_, done) {
+        it('should work within arrays', async function () {
           const router = new Router()
           const route = router.route(['/user/:user/poke', '/user/:user/pokes'])
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/user/tj/poke')
-                .expect(200, { user: 'tj' }, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/user/tj/pokes')
-                .expect(200, { user: 'tj' }, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/user/tj/poke')
+            .expect(200, { user: 'tj' })
+          await request(server)
+            .get('/user/tj/pokes')
+            .expect(200, { user: 'tj' })
         })
       })
 
       describe('using "{:name}"', function () {
-        it('should name an optional parameter', function (_, done) {
+        it('should name an optional parameter', async function () {
           const router = new Router()
           const route = router.route('{/:foo}')
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/bar')
-                .expect(200, { foo: 'bar' }, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/')
-                .expect(200, {}, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/bar')
+            .expect(200, { foo: 'bar' })
+          await request(server)
+            .get('/')
+            .expect(200, {})
         })
 
-        it('should work in any segment', function (_, done) {
+        it('should work in any segment', async function () {
           const router = new Router()
           const route = router.route('/user{/:foo}/delete')
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/user/bar/delete')
-                .expect(200, { foo: 'bar' }, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/user/delete')
-                .expect(200, {}, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/user/bar/delete')
+            .expect(200, { foo: 'bar' })
+          await request(server)
+            .get('/user/delete')
+            .expect(200, {})
         })
       })
 
       describe('using "*name"', function () {
-        it('should name a zero-or-more repeated parameter', function (_, done) {
+        it('should name a zero-or-more repeated parameter', async function () {
           const router = new Router()
           const route = router.route('{/*foo}')
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/')
-                .expect(200, {}, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/bar')
-                .expect(200, { foo: ['bar'] }, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/fizz/buzz')
-                .expect(200, { foo: ['fizz', 'buzz'] }, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/')
+            .expect(200, {})
+          await request(server)
+            .get('/bar')
+            .expect(200, { foo: ['bar'] })
+          await request(server)
+            .get('/fizz/buzz')
+            .expect(200, { foo: ['fizz', 'buzz'] })
         })
 
-        it('should work in any segment', function (_, done) {
+        it('should work in any segment', async function () {
           const router = new Router()
           const route = router.route('/user{/*foo}/delete')
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/user/delete')
-                .expect(200, {}, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/user/bar/delete')
-                .expect(200, { foo: ['bar'] }, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/user/fizz/buzz/delete')
-                .expect(200, { foo: ['fizz', 'buzz'] }, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/user/delete')
+            .expect(200, {})
+          await request(server)
+            .get('/user/bar/delete')
+            .expect(200, { foo: ['bar'] })
+          await request(server)
+            .get('/user/fizz/buzz/delete')
+            .expect(200, { foo: ['fizz', 'buzz'] })
         })
       })
 
       describe('using regular expression with param name "(?<name>pattern)"', function () {
-        it('should limit capture group to regexp match', function (_, done) {
+        it('should limit capture group to regexp match', async function () {
           const router = new Router()
           const route = router.route(/\/(?<foo>[0-9]+)/)
           const server = createServer(router)
 
           route.all(sendParams)
 
-          series([
-            function (cb) {
-              request(server)
-                .get('/foo')
-                .expect(404, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/42')
-                .expect(200, { foo: '42' }, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/foo')
+            .expect(404)
+          await request(server)
+            .get('/42')
+            .expect(200, { foo: '42' })
         })
       })
 
       describe('using "(regexp)"', function () {
-        it('should add capture group using regexp', function (_, done) {
+        it('should add capture group using regexp', async function () {
           const router = new Router()
           const route = router.route(/\/page_([0-9]+)/)
           const server = createServer(router)
 
           route.all(sendParams)
-          series([
-            function (cb) {
-              request(server)
-                .get('/page_foo')
-                .expect(404, cb)
-            },
-            function (cb) {
-              request(server)
-                .get('/page_42')
-                .expect(200, { 0: '42' }, cb)
-            }
-          ], done)
+          await request(server)
+            .get('/page_foo')
+            .expect(404)
+          await request(server)
+            .get('/page_42')
+            .expect(200, { 0: '42' })
         })
 
         it('should not treat regexp as literal regexp', function () {
