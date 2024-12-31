@@ -1,5 +1,4 @@
 const { it, describe } = require('node:test')
-const Buffer = require('safe-buffer').Buffer
 const methods = require('methods')
 const series = require('run-series')
 const Router = require('..')

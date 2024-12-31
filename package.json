@@ -17,7 +17,6 @@
     "after": "~0.8.2",
     "finalhandler": "~1",
     "run-series": "~1",
-    "safe-buffer": "~5",
     "standard": "~17",
     "supertest": "~7"
   },
