@@ -1,4 +1,4 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -6,7 +6,7 @@ const createServer = utils.createServer
 const request = utils.request
 
 describe('HEAD', function () {
-  it('should invoke get without head', function (done) {
+  it('should invoke get without head', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -19,7 +19,7 @@ describe('HEAD', function () {
       .expect(200, done)
   })
 
-  it('should invoke head if prior to get', function (done) {
+  it('should invoke head if prior to get', function (_, done) {
     const router = Router()
     const server = createServer(router)
 

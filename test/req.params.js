@@ -1,4 +1,4 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -6,7 +6,7 @@ const createServer = utils.createServer
 const request = utils.request
 
 describe('req.params', function () {
-  it('should default to empty object', function (done) {
+  it('should default to empty object', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -17,7 +17,7 @@ describe('req.params', function () {
       .expect(200, '{}', done)
   })
 
-  it('should not exist outside the router', function (done) {
+  it('should not exist outside the router', function (_, done) {
     const router = Router()
     const server = createServer(function (req, res, next) {
       router(req, res, function (err) {
@@ -34,7 +34,7 @@ describe('req.params', function () {
       .expect(200, '', done)
   })
 
-  it('should overwrite value outside the router', function (done) {
+  it('should overwrite value outside the router', function (_, done) {
     const router = Router()
     const server = createServer(function (req, res, next) {
       req.params = { foo: 'bar' }
@@ -48,7 +48,7 @@ describe('req.params', function () {
       .expect(200, '{}', done)
   })
 
-  it('should restore previous value outside the router', function (done) {
+  it('should restore previous value outside the router', function (_, done) {
     const router = Router()
     const server = createServer(function (req, res, next) {
       req.params = { foo: 'bar' }
@@ -68,7 +68,7 @@ describe('req.params', function () {
   })
 
   describe('when "mergeParams: true"', function () {
-    it('should merge outside object with params', function (done) {
+    it('should merge outside object with params', function (_, done) {
       const router = Router({ mergeParams: true })
       const server = createServer(function (req, res, next) {
         req.params = { foo: 'bar' }
@@ -87,7 +87,7 @@ describe('req.params', function () {
         .expect(200, '{"foo":"bar"}', done)
     })
 
-    it('should ignore non-object outside object', function (done) {
+    it('should ignore non-object outside object', function (_, done) {
       const router = Router({ mergeParams: true })
       const server = createServer(function (req, res, next) {
         req.params = 42
@@ -106,7 +106,7 @@ describe('req.params', function () {
         .expect(200, '42', done)
     })
 
-    it('should overwrite outside keys that are the same', function (done) {
+    it('should overwrite outside keys that are the same', function (_, done) {
       const router = Router({ mergeParams: true })
       const server = createServer(function (req, res, next) {
         req.params = { foo: 'bar' }
@@ -126,7 +126,7 @@ describe('req.params', function () {
     })
 
     describe('with numeric properties in req.params', function () {
-      it('should merge numeric properties by offsetting', function (done) {
+      it('should merge numeric properties by offsetting', function (_, done) {
         const router = Router({ mergeParams: true })
         const server = createServer(function (req, res, next) {
           req.params = { 0: 'foo', 1: 'bar' }
@@ -145,7 +145,7 @@ describe('req.params', function () {
           .expect(200, '{"0":"foo","1":"bar"}', done)
       })
 
-      it('should merge with same numeric properties', function (done) {
+      it('should merge with same numeric properties', function (_, done) {
         const router = Router({ mergeParams: true })
         const server = createServer(function (req, res, next) {
           req.params = { 0: 'foo' }

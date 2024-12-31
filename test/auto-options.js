@@ -1,4 +1,4 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -6,7 +6,7 @@ const createServer = utils.createServer
 const request = utils.request
 
 describe('OPTIONS', function () {
-  it('should respond with defined routes', function (done) {
+  it('should respond with defined routes', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -21,7 +21,7 @@ describe('OPTIONS', function () {
       .expect(200, 'GET, HEAD, POST, PUT', done)
   })
 
-  it('should not contain methods multiple times', function (done) {
+  it('should not contain methods multiple times', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -36,7 +36,7 @@ describe('OPTIONS', function () {
       .expect('Allow', 'GET, HEAD, PUT', done)
   })
 
-  it('should not include "all" routes', function (done) {
+  it('should not include "all" routes', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -52,7 +52,7 @@ describe('OPTIONS', function () {
       .expect(200, 'GET, HEAD, PUT', done)
   })
 
-  it('should not respond if no matching path', function (done) {
+  it('should not respond if no matching path', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -63,7 +63,7 @@ describe('OPTIONS', function () {
       .expect(404, done)
   })
 
-  it('should do nothing with explicit options route', function (done) {
+  it('should do nothing with explicit options route', function (_, done) {
     const router = Router()
     const server = createServer(router)
 
@@ -76,7 +76,7 @@ describe('OPTIONS', function () {
   })
 
   describe('when error occurs in respone handler', function () {
-    it('should pass error to callback', function (done) {
+    it('should pass error to callback', function (_, done) {
       const router = Router()
       const server = createServer(function hander (req, res, next) {
         res.writeHead(200)

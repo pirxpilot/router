@@ -20,8 +20,6 @@
   "devDependencies": {
     "after": "0.8.2",
     "finalhandler": "1.2.0",
-    "mocha": "10.2.0",
-    "nyc": "15.1.0",
     "run-series": "^1.1.9",
     "safe-buffer": "5.2.1",
     "standard": "^17.1.0",
@@ -39,11 +37,6 @@
     "node": ">= 0.10"
   },
   "scripts": {
-    "lint": "standard",
-    "test": "mocha --reporter spec --bail --check-leaks test/",
-    "test:debug": "mocha --reporter spec --bail --check-leaks test/ --inspect --inspect-brk",
-    "test-ci": "nyc --reporter=lcov --reporter=text npm test",
-    "test-cov": "nyc --reporter=text npm test",
-    "version": "node scripts/version-history.js && git add HISTORY.md"
+    "test": "make check"
   }
 }

@@ -1,4 +1,4 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
 const Buffer = require('safe-buffer').Buffer
 const methods = require('methods')
 const series = require('run-series')
@@ -24,7 +24,7 @@ describe('Router', function () {
       assert.equal(route.path, '/foo')
     })
 
-    it('should respond to multiple methods', function (done) {
+    it('should respond to multiple methods', function (_, done) {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -51,7 +51,7 @@ describe('Router', function () {
       ], done)
     })
 
-    it('should route without method', function (done) {
+    it('should route without method', function (_, done) {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(function (req, res, next) {
@@ -75,7 +75,7 @@ describe('Router', function () {
         .expect(200, 'saw undefined /foo', done)
     })
 
-    it('should stack', function (done) {
+    it('should stack', function (_, done) {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -110,7 +110,7 @@ describe('Router', function () {
       ], done)
     })
 
-    it('should not error on empty route', function (done) {
+    it('should not error on empty route', function (_, done) {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -131,7 +131,7 @@ describe('Router', function () {
       ], done)
     })
 
-    it('should not invoke singular error route', function (done) {
+    it('should not invoke singular error route', function (_, done) {
       const router = new Router()
       const route = router.route('/foo')
       const server = createServer(router)
@@ -145,8 +145,8 @@ describe('Router', function () {
         .expect(404, done)
     })
 
-    it('should not stack overflow with a large sync stack', function (done) {
-      this.timeout(5000) // long-running test
+    it('should not stack overflow with a large sync stack', function (_, done) {
+      // long-running test
 
       const router = new Router()
       const route = router.route('/foo')
@@ -182,7 +182,7 @@ describe('Router', function () {
         assert.throws(route.all.bind(route, 2), /argument handler must be a function/)
       })
 
-      it('should respond to all methods', function (done) {
+      it('should respond to all methods', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -208,7 +208,7 @@ describe('Router', function () {
         ], done)
       })
 
-      it('should accept multiple arguments', function (done) {
+      it('should accept multiple arguments', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -222,7 +222,7 @@ describe('Router', function () {
           .expect(200, 'hello, world', done)
       })
 
-      it('should accept single array of handlers', function (done) {
+      it('should accept single array of handlers', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -236,7 +236,7 @@ describe('Router', function () {
           .expect(200, 'hello, world', done)
       })
 
-      it('should accept nested arrays of handlers', function (done) {
+      it('should accept nested arrays of handlers', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -266,7 +266,7 @@ describe('Router', function () {
         : shouldNotHaveBody()
 
       describe('.' + method + '(...fn)', function () {
-        it('should respond to a ' + method.toUpperCase() + ' request', function (done) {
+        it('should respond to a ' + method.toUpperCase() + ' request', function (_, done) {
           const router = new Router()
           const route = router.route('/')
           const server = createServer(router)
@@ -297,7 +297,7 @@ describe('Router', function () {
           assert.throws(route[method].bind(route, 2), /argument handler must be a function/)
         })
 
-        it('should accept multiple arguments', function (done) {
+        it('should accept multiple arguments', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -312,7 +312,7 @@ describe('Router', function () {
             .end(done)
         })
 
-        it('should accept single array of handlers', function (done) {
+        it('should accept single array of handlers', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -327,7 +327,7 @@ describe('Router', function () {
             .end(done)
         })
 
-        it('should accept nested arrays of handlers', function (done) {
+        it('should accept nested arrays of handlers', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -346,7 +346,7 @@ describe('Router', function () {
     })
 
     describe('error handling', function () {
-      it('should handle errors from next(err)', function (done) {
+      it('should handle errors from next(err)', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -367,7 +367,7 @@ describe('Router', function () {
           .expect(500, 'caught: boom!', done)
       })
 
-      it('should handle errors thrown', function (done) {
+      it('should handle errors thrown', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -388,7 +388,7 @@ describe('Router', function () {
           .expect(500, 'caught: boom!', done)
       })
 
-      it('should handle errors thrown in error handlers', function (done) {
+      it('should handle errors thrown in error handlers', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -413,7 +413,7 @@ describe('Router', function () {
     })
 
     describe('next("route")', function () {
-      it('should invoke next handler', function (done) {
+      it('should invoke next handler', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -431,7 +431,7 @@ describe('Router', function () {
           .expect(200, 'saw GET /foo', done)
       })
 
-      it('should invoke next route', function (done) {
+      it('should invoke next route', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -449,7 +449,7 @@ describe('Router', function () {
           .expect(200, 'saw GET /foo', done)
       })
 
-      it('should skip next handlers in route', function (done) {
+      it('should skip next handlers in route', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -471,7 +471,7 @@ describe('Router', function () {
           .expect(200, 'saw GET /foo', done)
       })
 
-      it('should not invoke error handlers', function (done) {
+      it('should not invoke error handlers', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -494,7 +494,7 @@ describe('Router', function () {
     })
 
     describe('next("router")', function () {
-      it('should exit the router', function (done) {
+      it('should exit the router', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -515,7 +515,7 @@ describe('Router', function () {
           .expect(404, done)
       })
 
-      it('should not invoke error handlers', function (done) {
+      it('should not invoke error handlers', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -543,7 +543,7 @@ describe('Router', function () {
     })
 
     describePromises('promise support', function () {
-      it('should pass rejected promise value', function (done) {
+      it('should pass rejected promise value', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -564,7 +564,7 @@ describe('Router', function () {
           .expect(500, 'caught: boom!', done)
       })
 
-      it('should pass rejected promise without value', function (done) {
+      it('should pass rejected promise without value', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -585,7 +585,7 @@ describe('Router', function () {
           .expect(500, 'caught: Rejected promise', done)
       })
 
-      it('should ignore resolved promise', function (done) {
+      it('should ignore resolved promise', function (_, done) {
         const router = new Router()
         const route = router.route('/foo')
         const server = createServer(router)
@@ -605,7 +605,7 @@ describe('Router', function () {
       })
 
       describe('error handling', function () {
-        it('should pass rejected promise value', function (done) {
+        it('should pass rejected promise value', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -628,7 +628,7 @@ describe('Router', function () {
             .expect(500, 'caught again: caught: boom!', done)
         })
 
-        it('should pass rejected promise without value', function (done) {
+        it('should pass rejected promise without value', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -652,7 +652,7 @@ describe('Router', function () {
             .expect(500, 'caught again: Rejected promise', done)
         })
 
-        it('should ignore resolved promise', function (done) {
+        it('should ignore resolved promise', function (_, done) {
           const router = new Router()
           const route = router.route('/foo')
           const server = createServer(router)
@@ -680,7 +680,7 @@ describe('Router', function () {
 
     describe('path', function () {
       describe('using ":name"', function () {
-        it('should name a capture group', function (done) {
+        it('should name a capture group', function (_, done) {
           const router = new Router()
           const route = router.route('/:foo')
           const server = createServer(router)
@@ -692,7 +692,7 @@ describe('Router', function () {
             .expect(200, { foo: 'bar' }, done)
         })
 
-        it('should match single path segment', function (done) {
+        it('should match single path segment', function (_, done) {
           const router = new Router()
           const route = router.route('/:foo')
           const server = createServer(router)
@@ -704,7 +704,7 @@ describe('Router', function () {
             .expect(404, done)
         })
 
-        it('should work multiple times', function (done) {
+        it('should work multiple times', function (_, done) {
           const router = new Router()
           const route = router.route('/:foo/:bar')
           const server = createServer(router)
@@ -716,7 +716,7 @@ describe('Router', function () {
             .expect(200, { foo: 'fizz', bar: 'buzz' }, done)
         })
 
-        it('should work inside literal paranthesis', function (done) {
+        it('should work inside literal paranthesis', function (_, done) {
           const router = new Router()
           const route = router.route('/:user\\(:op\\)')
           const server = createServer(router)
@@ -728,7 +728,7 @@ describe('Router', function () {
             .expect(200, { user: 'tj', op: 'edit' }, done)
         })
 
-        it('should work within arrays', function (done) {
+        it('should work within arrays', function (_, done) {
           const router = new Router()
           const route = router.route(['/user/:user/poke', '/user/:user/pokes'])
           const server = createServer(router)
@@ -750,7 +750,7 @@ describe('Router', function () {
       })
 
       describe('using "{:name}"', function () {
-        it('should name an optional parameter', function (done) {
+        it('should name an optional parameter', function (_, done) {
           const router = new Router()
           const route = router.route('{/:foo}')
           const server = createServer(router)
@@ -770,7 +770,7 @@ describe('Router', function () {
           ], done)
         })
 
-        it('should work in any segment', function (done) {
+        it('should work in any segment', function (_, done) {
           const router = new Router()
           const route = router.route('/user{/:foo}/delete')
           const server = createServer(router)
@@ -792,7 +792,7 @@ describe('Router', function () {
       })
 
       describe('using "*name"', function () {
-        it('should name a zero-or-more repeated parameter', function (done) {
+        it('should name a zero-or-more repeated parameter', function (_, done) {
           const router = new Router()
           const route = router.route('{/*foo}')
           const server = createServer(router)
@@ -817,7 +817,7 @@ describe('Router', function () {
           ], done)
         })
 
-        it('should work in any segment', function (done) {
+        it('should work in any segment', function (_, done) {
           const router = new Router()
           const route = router.route('/user{/*foo}/delete')
           const server = createServer(router)
@@ -844,7 +844,7 @@ describe('Router', function () {
       })
 
       describe('using regular expression with param name "(?<name>pattern)"', function () {
-        it('should limit capture group to regexp match', function (done) {
+        it('should limit capture group to regexp match', function (_, done) {
           const router = new Router()
           const route = router.route(/\/(?<foo>[0-9]+)/)
           const server = createServer(router)
@@ -867,7 +867,7 @@ describe('Router', function () {
       })
 
       describe('using "(regexp)"', function () {
-        it('should add capture group using regexp', function (done) {
+        it('should add capture group using regexp', function (_, done) {
           const router = new Router()
           const route = router.route(/\/page_([0-9]+)/)
           const server = createServer(router)
