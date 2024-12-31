@@ -15,7 +15,6 @@
 const isPromise = require('is-promise')
 const Layer = require('./lib/layer')
 const methods = require('methods')
-const mixin = require('utils-merge')
 const parseUrl = require('parseurl')
 const Route = require('./lib/route')
 const setPrototypeOf = require('setprototypeof')
@@ -526,11 +525,11 @@ function mergeParams (params, parent) {
   }
 
   // make copy of parent for base
-  const obj = mixin({}, parent)
+  const obj = { ...parent }
 
   // simple non-numeric merging
   if (!(0 in params) || !(0 in parent)) {
-    return mixin(obj, params)
+    return Object.assign(obj, params)
   }
 
   let i = 0
@@ -556,7 +555,7 @@ function mergeParams (params, parent) {
     }
   }
 
-  return mixin(obj, params)
+  return Object.assign(obj, params)
 }
 
 /**
