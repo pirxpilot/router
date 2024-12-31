@@ -1,4 +1,4 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
 const Router = require('..')
 const utils = require('./support/utils')
 
@@ -6,7 +6,7 @@ const createServer = utils.createServer
 const rawrequest = utils.rawrequest
 
 describe('FQDN url', function () {
-  it('should not obscure FQDNs', function (done) {
+  it('should not obscure FQDNs', function (_, done) {
     const router = new Router()
     const server = createServer(router)
 
@@ -17,7 +17,7 @@ describe('FQDN url', function () {
       .expect(200, 'saw GET http://example.com/foo', done)
   })
 
-  it('should strip/restore FQDN req.url', function (done) {
+  it('should strip/restore FQDN req.url', function (_, done) {
     const router = new Router()
     const server = createServer(router)
 
@@ -30,7 +30,7 @@ describe('FQDN url', function () {
       .expect(200, 'saw GET http://example.com/blog/post/1', done)
   })
 
-  it('should ignore FQDN in search', function (done) {
+  it('should ignore FQDN in search', function (_, done) {
     const router = new Router()
     const server = createServer(router)
 
@@ -43,7 +43,7 @@ describe('FQDN url', function () {
       .expect(200, 'saw GET /proxy?url=http://example.com/blog/post/1', done)
   })
 
-  it('should ignore FQDN in path', function (done) {
+  it('should ignore FQDN in path', function (_, done) {
     const router = new Router()
     const server = createServer(router)
 

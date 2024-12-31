@@ -12,21 +12,15 @@
  * @private
  */
 
-const flatten = require('array-flatten').flatten
-const isPromise = require('is-promise')
 const Layer = require('./lib/layer')
 const methods = require('methods')
-const mixin = require('utils-merge')
 const parseUrl = require('parseurl')
 const Route = require('./lib/route')
-const setPrototypeOf = require('setprototypeof')
 
 /**
  * Module variables.
  * @private
  */
-
-const slice = Array.prototype.slice
 
 /**
  * Expose `Router`.
@@ -60,7 +54,7 @@ function Router (options) {
   }
 
   // inherit from the correct prototype
-  setPrototypeOf(router, this)
+  Object.setPrototypeOf(router, this)
 
   router.caseSensitive = opts.caseSensitive
   router.mergeParams = opts.mergeParams
@@ -354,8 +348,7 @@ Router.prototype.handle = function handle (req, res, callback) {
  * @public
  */
 
-Router.prototype.use = function use (handler) {
-  let offset = 0
+Router.prototype.use = function use (handler, ...args) {
   let path = '/'
 
   // default path to '/'
@@ -369,12 +362,14 @@ Router.prototype.use = function use (handler) {
 
     // first arg is the path
     if (typeof arg !== 'function') {
-      offset = 1
       path = handler
+      handler = undefined
     }
   }
-
-  const callbacks = flatten(slice.call(arguments, offset))
+  if (handler !== undefined) {
+    args.unshift(handler)
+  }
+  const callbacks = args.flat(Infinity)
 
   if (callbacks.length === 0) {
     throw new TypeError('argument handler is required')
@@ -436,9 +431,9 @@ Router.prototype.route = function route (path) {
 
 // create Router#VERB functions
 methods.concat('all').forEach(function (method) {
-  Router.prototype[method] = function (path) {
+  Router.prototype[method] = function (path, ...args) {
     const route = this.route(path)
-    route[method].apply(route, slice.call(arguments, 1))
+    route[method].apply(route, args)
     return this
   }
 })
@@ -527,11 +522,11 @@ function mergeParams (params, parent) {
   }
 
   // make copy of parent for base
-  const obj = mixin({}, parent)
+  const obj = { ...parent }
 
   // simple non-numeric merging
   if (!(0 in params) || !(0 in parent)) {
-    return mixin(obj, params)
+    return Object.assign(obj, params)
   }
 
   let i = 0
@@ -557,7 +552,7 @@ function mergeParams (params, parent) {
     }
   }
 
-  return mixin(obj, params)
+  return Object.assign(obj, params)
 }
 
 /**
@@ -640,10 +635,8 @@ function processParams (params, layer, called, req, res, done) {
 
     try {
       const ret = fn(req, res, paramCallback, paramVal, key)
-      if (isPromise(ret)) {
-        ret.then(null, function (error) {
-          paramCallback(error || new Error('Rejected promise'))
-        })
+      if (ret instanceof Promise) {
+        ret.catch((error = new Error('Rejected promise')) => paramCallback(error))
       }
     } catch (e) {
       paramCallback(e)
@@ -659,14 +652,8 @@ function processParams (params, layer, called, req, res, done) {
  * @private
  */
 
-function restore (fn, obj) {
-  const props = new Array(arguments.length - 2)
-  const vals = new Array(arguments.length - 2)
-
-  for (let i = 0; i < props.length; i++) {
-    props[i] = arguments[i + 2]
-    vals[i] = obj[props[i]]
-  }
+function restore (fn, obj, ...props) {
+  const vals = props.map(prop => obj[prop])
 
   return function () {
     // restore vals
@@ -724,14 +711,7 @@ function trySendOptionsResponse (res, methods, next) {
  */
 
 function wrap (old, fn) {
-  return function proxy () {
-    const args = new Array(arguments.length + 1)
-
-    args[0] = old
-    for (let i = 0, len = arguments.length; i < len; i++) {
-      args[i + 1] = arguments[i]
-    }
-
-    fn.apply(this, args)
+  return function proxy (...args) {
+    fn.call(this, old, ...args)
   }
 }

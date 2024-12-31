@@ -1,11 +1,9 @@
-const assert = require('assert')
-const Buffer = require('safe-buffer').Buffer
+const assert = require('node:assert/strict')
 const finalhandler = require('finalhandler')
 const http = require('http')
 const methods = require('methods')
 const request = require('supertest')
 
-exports.assert = assert
 exports.createHitHandle = createHitHandle
 exports.createServer = createServer
 exports.rawrequest = rawrequest

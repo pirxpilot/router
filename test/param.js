@@ -1,16 +1,14 @@
-const { it, describe } = require('mocha')
+const { it, describe } = require('node:test')
+const assert = require('node:assert/strict')
 const series = require('run-series')
 const Router = require('..')
 const utils = require('./support/utils')
 
-const assert = utils.assert
 const createHitHandle = utils.createHitHandle
 const shouldHitHandle = utils.shouldHitHandle
 const shouldNotHitHandle = utils.shouldNotHitHandle
 const createServer = utils.createServer
 const request = utils.request
-
-const describePromises = global.Promise ? describe : describe.skip
 
 describe('Router', function () {
   describe('.param(name, fn)', function () {
@@ -34,7 +32,7 @@ describe('Router', function () {
       assert.throws(router.param.bind(router, 'id', 42), /argument fn must be a function/)
     })
 
-    it('should map logic for a path param', function (done) {
+    it('should map logic for a path param', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -62,7 +60,7 @@ describe('Router', function () {
       ], done)
     })
 
-    it('should allow chaining', function (done) {
+    it('should allow chaining', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -86,7 +84,7 @@ describe('Router', function () {
         .expect(200, 'get user 2 (2)', done)
     })
 
-    it('should automatically decode path value', function (done) {
+    it('should automatically decode path value', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -105,7 +103,7 @@ describe('Router', function () {
         .expect('get user "bob/robert"', done)
     })
 
-    it('should 400 on invalid path value', function (done) {
+    it('should 400 on invalid path value', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -124,7 +122,7 @@ describe('Router', function () {
         .expect(400, /URIError: Failed to decode param/, done)
     })
 
-    it('should only invoke fn when necessary', function (done) {
+    it('should only invoke fn when necessary', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -155,7 +153,7 @@ describe('Router', function () {
       ], done)
     })
 
-    it('should only invoke fn once per request', function (done) {
+    it('should only invoke fn once per request', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -177,7 +175,7 @@ describe('Router', function () {
         .expect('get user bob 1 times', done)
     })
 
-    it('should keep changes to req.params value', function (done) {
+    it('should keep changes to req.params value', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -201,7 +199,7 @@ describe('Router', function () {
         .expect('get user 1 1 times', done)
     })
 
-    it('should invoke fn if path value differs', function (done) {
+    it('should invoke fn if path value differs', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -224,7 +222,7 @@ describe('Router', function () {
         .expect('get user bob 2 times: user, bob', done)
     })
 
-    it('should catch exception in fn', function (done) {
+    it('should catch exception in fn', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -242,7 +240,7 @@ describe('Router', function () {
         .expect(500, /Error: boom/, done)
     })
 
-    it('should catch exception in chained fn', function (done) {
+    it('should catch exception in chained fn', function (_, done) {
       const router = new Router()
       const server = createServer(router)
 
@@ -264,8 +262,8 @@ describe('Router', function () {
         .expect(500, /Error: boom/, done)
     })
 
-    describePromises('promise support', function () {
-      it('should pass rejected promise value', function (done) {
+    describe('promise support', function () {
+      it('should pass rejected promise value', function (_, done) {
         const router = new Router()
         const server = createServer(router)
 
@@ -283,7 +281,7 @@ describe('Router', function () {
           .expect(500, /Error: boom/, done)
       })
 
-      it('should pass rejected promise without value', function (done) {
+      it('should pass rejected promise without value', function (_, done) {
         const router = new Router()
         const server = createServer(router)
 
@@ -307,7 +305,7 @@ describe('Router', function () {
     })
 
     describe('next("route")', function () {
-      it('should cause route with param to be skipped', function (done) {
+      it('should cause route with param to be skipped', function (_, done) {
         const router = new Router()
         const server = createServer(router)
 
@@ -352,7 +350,7 @@ describe('Router', function () {
         ], done)
       })
 
-      it('should invoke fn if path value differs', function (done) {
+      it('should invoke fn if path value differs', function (_, done) {
         const router = new Router()
         const server = createServer(router)
 
