@@ -16,7 +16,6 @@ const Layer = require('./lib/layer')
 const methods = require('methods')
 const parseUrl = require('parseurl')
 const Route = require('./lib/route')
-const setPrototypeOf = require('setprototypeof')
 
 /**
  * Module variables.
@@ -55,7 +54,7 @@ function Router (options) {
   }
 
   // inherit from the correct prototype
-  setPrototypeOf(router, this)
+  Object.setPrototypeOf(router, this)
 
   router.caseSensitive = opts.caseSensitive
   router.mergeParams = opts.mergeParams
