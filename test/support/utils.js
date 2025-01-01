@@ -38,19 +38,21 @@ function rawrequest (server) {
   })
 
   function expect (status, body, callback) {
-    if (arguments.length === 2) {
+    if (typeof status === 'string' && !callback) {
       _headers[status.toLowerCase()] = body
       return this
     }
+    const { promise, resolve, reject } = Promise.withResolvers()
 
     let _server
 
     if (!server.address()) {
       _server = server.listen(0, onListening)
-      return
+      return promise
     }
 
     onListening.call(server)
+    return promise
 
     function onListening () {
       const addr = this.address()
@@ -85,7 +87,12 @@ function rawrequest (server) {
             _server.close()
           }
 
-          callback(err)
+          callback?.(err)
+          if (err) {
+            reject(err)
+          } else {
+            resolve()
+          }
         })
       })
       req.end()
