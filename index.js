@@ -12,8 +12,8 @@
  * @private
  */
 
+const { METHODS } = require('node:http')
 const Layer = require('./lib/layer')
-const methods = require('methods')
 const parseUrl = require('parseurl')
 const Route = require('./lib/route')
 
@@ -375,9 +375,7 @@ Router.prototype.use = function use (handler, ...args) {
     throw new TypeError('argument handler is required')
   }
 
-  for (let i = 0; i < callbacks.length; i++) {
-    const fn = callbacks[i]
-
+  this.stack.push(...callbacks.map(fn => {
     if (typeof fn !== 'function') {
       throw new TypeError('argument handler must be a function')
     }
@@ -390,9 +388,8 @@ Router.prototype.use = function use (handler, ...args) {
     }, fn)
 
     layer.route = undefined
-
-    this.stack.push(layer)
-  }
+    return layer
+  }))
 
   return this
 }
@@ -430,13 +427,15 @@ Router.prototype.route = function route (path) {
 }
 
 // create Router#VERB functions
-methods.concat('all').forEach(function (method) {
-  Router.prototype[method] = function (path, ...args) {
-    const route = this.route(path)
-    route[method].apply(route, args)
-    return this
-  }
-})
+METHODS.concat('all')
+  .map(m => m.toLowerCase())
+  .forEach(method => {
+    Router.prototype[method] = function (path, ...args) {
+      const route = this.route(path)
+      route[method].apply(route, args)
+      return this
+    }
+  })
 
 /**
  * Generate a callback that will make an OPTIONS response.

@@ -12,13 +12,11 @@
     "url": "git+https://github.com/pirxpilot/router.git"
   },
   "dependencies": {
-    "methods": "~1",
     "parseurl": "~1",
     "path-to-regexp": "~8"
   },
   "devDependencies": {
     "finalhandler": "~1",
-    "run-series": "~1",
     "standard": "~17",
     "supertest": "~7"
   },
