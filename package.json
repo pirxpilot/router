@@ -12,7 +12,6 @@
     "url": "git+https://github.com/pirxpilot/router.git"
   },
   "dependencies": {
-    "methods": "~1",
     "parseurl": "~1",
     "path-to-regexp": "~8"
   },

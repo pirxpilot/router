@@ -1,10 +1,11 @@
 const { it, describe } = require('node:test')
 const assert = require('node:assert/strict')
 
-const methods = require('methods')
+const { METHODS } = require('node:http')
 const Router = require('..')
 const utils = require('./support/utils')
 
+const methods = METHODS.map(m => m.toLowerCase())
 const createHitHandle = utils.createHitHandle
 const createServer = utils.createServer
 const rawrequest = utils.rawrequest

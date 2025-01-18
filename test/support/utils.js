@@ -1,7 +1,8 @@
 const assert = require('node:assert/strict')
+const http = require('node:http')
 const finalhandler = require('finalhandler')
-const http = require('http')
-const methods = require('methods')
+
+const methods = http.METHODS.map(m => m.toLowerCase())
 const request = require('supertest')
 
 exports.createHitHandle = createHitHandle
