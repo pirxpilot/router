@@ -1,4 +1,15 @@
 
+1.1.0 / 2025-01-18
+==================
+
+ * simplify layer creation
+ * remove `methods` dependency
+ * replace run-series with await/async
+ * allow using rawrequest with promises
+ * minor ES6 fixes
+ * minor improvement in Router.use
+ * use Set to keep track of route methods
+
 1.0.0 / 2024-12-31
 ==================
 
