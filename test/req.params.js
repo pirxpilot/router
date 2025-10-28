@@ -1,182 +1,163 @@
-const { it, describe } = require('node:test')
-const Router = require('..')
-const utils = require('./support/utils')
+const { it, describe } = require('node:test');
+const Router = require('..');
+const utils = require('./support/utils');
 
-const createServer = utils.createServer
-const request = utils.request
+const createServer = utils.createServer;
+const request = utils.request;
 
-describe('req.params', function () {
-  it('should default to empty object', function (_, done) {
-    const router = Router()
-    const server = createServer(router)
+describe('req.params', () => {
+  it('should default to empty object', (_, done) => {
+    const router = Router();
+    const server = createServer(router);
 
-    router.get('/', sawParams)
+    router.get('/', sawParams);
 
-    request(server)
-      .get('/')
-      .expect(200, '{}', done)
-  })
+    request(server).get('/').expect(200, '{}', done);
+  });
 
-  it('should not exist outside the router', function (_, done) {
-    const router = Router()
-    const server = createServer(function (req, res, next) {
-      router(req, res, function (err) {
-        if (err) return next(err)
-        sawParams(req, res)
-      })
-    })
+  it('should not exist outside the router', (_, done) => {
+    const router = Router();
+    const server = createServer((req, res, next) => {
+      router(req, res, err => {
+        if (err) return next(err);
+        sawParams(req, res);
+      });
+    });
 
-    router.get('/', hitParams(1))
+    router.get('/', hitParams(1));
 
-    request(server)
-      .get('/')
-      .expect('x-params-1', '{}')
-      .expect(200, '', done)
-  })
+    request(server).get('/').expect('x-params-1', '{}').expect(200, '', done);
+  });
 
-  it('should overwrite value outside the router', function (_, done) {
-    const router = Router()
-    const server = createServer(function (req, res, next) {
-      req.params = { foo: 'bar' }
-      router(req, res, done)
-    })
+  it('should overwrite value outside the router', (_, done) => {
+    const router = Router();
+    const server = createServer((req, res, _next) => {
+      req.params = { foo: 'bar' };
+      router(req, res, done);
+    });
 
-    router.get('/', sawParams)
+    router.get('/', sawParams);
 
-    request(server)
-      .get('/')
-      .expect(200, '{}', done)
-  })
+    request(server).get('/').expect(200, '{}', done);
+  });
 
-  it('should restore previous value outside the router', function (_, done) {
-    const router = Router()
-    const server = createServer(function (req, res, next) {
-      req.params = { foo: 'bar' }
+  it('should restore previous value outside the router', (_, done) => {
+    const router = Router();
+    const server = createServer((req, res, next) => {
+      req.params = { foo: 'bar' };
 
-      router(req, res, function (err) {
-        if (err) return next(err)
-        sawParams(req, res)
-      })
-    })
+      router(req, res, err => {
+        if (err) return next(err);
+        sawParams(req, res);
+      });
+    });
 
-    router.get('/', hitParams(1))
+    router.get('/', hitParams(1));
 
-    request(server)
-      .get('/')
-      .expect('x-params-1', '{}')
-      .expect(200, '{"foo":"bar"}', done)
-  })
+    request(server).get('/').expect('x-params-1', '{}').expect(200, '{"foo":"bar"}', done);
+  });
 
-  describe('when "mergeParams: true"', function () {
-    it('should merge outside object with params', function (_, done) {
-      const router = Router({ mergeParams: true })
-      const server = createServer(function (req, res, next) {
-        req.params = { foo: 'bar' }
+  describe('when "mergeParams: true"', () => {
+    it('should merge outside object with params', (_, done) => {
+      const router = Router({ mergeParams: true });
+      const server = createServer((req, res, next) => {
+        req.params = { foo: 'bar' };
 
-        router(req, res, function (err) {
-          if (err) return next(err)
-          sawParams(req, res)
-        })
-      })
+        router(req, res, err => {
+          if (err) return next(err);
+          sawParams(req, res);
+        });
+      });
 
-      router.get('/:fizz', hitParams(1))
+      router.get('/:fizz', hitParams(1));
 
       request(server)
         .get('/buzz')
         .expect('x-params-1', '{"foo":"bar","fizz":"buzz"}')
-        .expect(200, '{"foo":"bar"}', done)
-    })
+        .expect(200, '{"foo":"bar"}', done);
+    });
 
-    it('should ignore non-object outside object', function (_, done) {
-      const router = Router({ mergeParams: true })
-      const server = createServer(function (req, res, next) {
-        req.params = 42
+    it('should ignore non-object outside object', (_, done) => {
+      const router = Router({ mergeParams: true });
+      const server = createServer((req, res, next) => {
+        req.params = 42;
 
-        router(req, res, function (err) {
-          if (err) return next(err)
-          sawParams(req, res)
-        })
-      })
+        router(req, res, err => {
+          if (err) return next(err);
+          sawParams(req, res);
+        });
+      });
 
-      router.get('/:fizz', hitParams(1))
+      router.get('/:fizz', hitParams(1));
 
-      request(server)
-        .get('/buzz')
-        .expect('x-params-1', '{"fizz":"buzz"}')
-        .expect(200, '42', done)
-    })
+      request(server).get('/buzz').expect('x-params-1', '{"fizz":"buzz"}').expect(200, '42', done);
+    });
 
-    it('should overwrite outside keys that are the same', function (_, done) {
-      const router = Router({ mergeParams: true })
-      const server = createServer(function (req, res, next) {
-        req.params = { foo: 'bar' }
+    it('should overwrite outside keys that are the same', (_, done) => {
+      const router = Router({ mergeParams: true });
+      const server = createServer((req, res, next) => {
+        req.params = { foo: 'bar' };
 
-        router(req, res, function (err) {
-          if (err) return next(err)
-          sawParams(req, res)
-        })
-      })
+        router(req, res, err => {
+          if (err) return next(err);
+          sawParams(req, res);
+        });
+      });
 
-      router.get('/:foo', hitParams(1))
+      router.get('/:foo', hitParams(1));
 
-      request(server)
-        .get('/buzz')
-        .expect('x-params-1', '{"foo":"buzz"}')
-        .expect(200, '{"foo":"bar"}', done)
-    })
+      request(server).get('/buzz').expect('x-params-1', '{"foo":"buzz"}').expect(200, '{"foo":"bar"}', done);
+    });
 
-    describe('with numeric properties in req.params', function () {
-      it('should merge numeric properties by offsetting', function (_, done) {
-        const router = Router({ mergeParams: true })
-        const server = createServer(function (req, res, next) {
-          req.params = { 0: 'foo', 1: 'bar' }
+    describe('with numeric properties in req.params', () => {
+      it('should merge numeric properties by offsetting', (_, done) => {
+        const router = Router({ mergeParams: true });
+        const server = createServer((req, res, next) => {
+          req.params = { 0: 'foo', 1: 'bar' };
 
-          router(req, res, function (err) {
-            if (err) return next(err)
-            sawParams(req, res)
-          })
-        })
+          router(req, res, err => {
+            if (err) return next(err);
+            sawParams(req, res);
+          });
+        });
 
-        router.get(/\/([^/]*)/, hitParams(1))
+        router.get(/\/([^/]*)/, hitParams(1));
 
         request(server)
           .get('/buzz')
           .expect('x-params-1', '{"0":"foo","1":"bar","2":"buzz"}')
-          .expect(200, '{"0":"foo","1":"bar"}', done)
-      })
+          .expect(200, '{"0":"foo","1":"bar"}', done);
+      });
 
-      it('should merge with same numeric properties', function (_, done) {
-        const router = Router({ mergeParams: true })
-        const server = createServer(function (req, res, next) {
-          req.params = { 0: 'foo' }
+      it('should merge with same numeric properties', (_, done) => {
+        const router = Router({ mergeParams: true });
+        const server = createServer((req, res, next) => {
+          req.params = { 0: 'foo' };
 
-          router(req, res, function (err) {
-            if (err) return next(err)
-            sawParams(req, res)
-          })
-        })
+          router(req, res, err => {
+            if (err) return next(err);
+            sawParams(req, res);
+          });
+        });
 
-        router.get(/\/([^/]*)/, hitParams(1))
+        router.get(/\/([^/]*)/, hitParams(1));
 
-        request(server)
-          .get('/bar')
-          .expect('x-params-1', '{"0":"foo","1":"bar"}')
-          .expect(200, '{"0":"foo"}', done)
-      })
-    })
-  })
-})
+        request(server).get('/bar').expect('x-params-1', '{"0":"foo","1":"bar"}').expect(200, '{"0":"foo"}', done);
+      });
+    });
+  });
+});
 
-function hitParams (num) {
-  const name = 'x-params-' + String(num)
-  return function hit (req, res, next) {
-    res.setHeader(name, JSON.stringify(req.params))
-    next()
-  }
+function hitParams(num) {
+  const name = `x-params-${String(num)}`;
+  return function hit(req, res, next) {
+    res.setHeader(name, JSON.stringify(req.params));
+    next();
+  };
 }
 
-function sawParams (req, res) {
-  res.statusCode = 200
-  res.setHeader('Content-Type', 'application/json')
-  res.end(JSON.stringify(req.params))
+function sawParams(req, res) {
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(req.params));
 }

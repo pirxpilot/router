@@ -1,15 +1,15 @@
 check: lint test
 
 lint:
-	node_modules/.bin/standard
+	./node_modules/.bin/biome ci
+
+format:
+	./node_modules/.bin/biome check --fix
 
 test:
-	node --test
+	node --test $(TEST_OPTS)
 
-test-cov:
-	node --experimental-test-coverage --test
+test-cov: TEST_OPTS := --experimental-test-coverage
+test-cov: test
 
-distclean:
-	rm -rf yarn.lock node_modules
-
-.PHONY: check lint test test-cov distclean
+.PHONY: check format lint test test-cov

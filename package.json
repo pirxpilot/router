@@ -16,16 +16,12 @@
     "path-to-regexp": "~8"
   },
   "devDependencies": {
+    "@biomejs/biome": "2.3.1",
     "finalhandler": "~1",
-    "standard": "~17",
     "supertest": "~7"
   },
   "files": [
     "lib/",
-    "LICENSE",
-    "HISTORY.md",
-    "README.md",
-    "SECURITY.md",
     "index.js"
   ],
   "engines": {
