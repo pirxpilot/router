@@ -1,9 +1,6 @@
-const { it, describe } = require('node:test');
-const Router = require('..');
-const utils = require('./support/utils');
-
-const createServer = utils.createServer;
-const rawrequest = utils.rawrequest;
+import { describe, it } from 'node:test';
+import Router from '../index.js';
+import { createServer, rawrequest } from './support/utils.js';
 
 describe('FQDN url', () => {
   it('should not obscure FQDNs', (_, done) => {

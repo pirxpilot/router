@@ -1,20 +1,13 @@
-const assert = require('node:assert/strict');
-const http = require('node:http');
-const finalhandler = require('finalhandler');
+import assert from 'node:assert/strict';
+import http from 'node:http';
+import finalhandler from 'finalhandler';
+import request from 'supertest';
 
 const methods = http.METHODS.map(m => m.toLowerCase());
-const request = require('supertest');
 
-exports.createHitHandle = createHitHandle;
-exports.createServer = createServer;
-exports.rawrequest = rawrequest;
-exports.request = request;
-exports.shouldHaveBody = shouldHaveBody;
-exports.shouldNotHaveBody = shouldNotHaveBody;
-exports.shouldHitHandle = shouldHitHandle;
-exports.shouldNotHitHandle = shouldNotHitHandle;
+export { request };
 
-function createHitHandle(num) {
+export function createHitHandle(num) {
   const name = `x-fn-${String(num)}`;
   return function hit(_req, res, next) {
     res.setHeader(name, 'hit');
@@ -22,13 +15,13 @@ function createHitHandle(num) {
   };
 }
 
-function createServer(router) {
+export function createServer(router) {
   return http.createServer(function onRequest(req, res) {
     router(req, res, finalhandler(req, res));
   });
 }
 
-function rawrequest(server) {
+export function rawrequest(server) {
   const _headers = {};
   let _method;
   let _path;
@@ -114,7 +107,7 @@ function rawrequest(server) {
   return _test;
 }
 
-function shouldHaveBody(buf) {
+export function shouldHaveBody(buf) {
   return res => {
     const body = !Buffer.isBuffer(res.body) ? Buffer.from(res.text) : res.body;
     assert.ok(body, 'response has body');
@@ -122,24 +115,24 @@ function shouldHaveBody(buf) {
   };
 }
 
-function shouldHitHandle(num) {
+export function shouldHitHandle(num) {
   const header = `x-fn-${String(num)}`;
   return res => {
     assert.equal(res.headers[header], 'hit', `should hit handle ${num}`);
   };
 }
 
-function shouldNotHaveBody() {
+export function shouldNotHaveBody() {
   return res => {
     assert.ok(res.text === '' || res.text === undefined);
   };
 }
 
-function shouldNotHitHandle(num) {
+export function shouldNotHitHandle(num) {
   return shouldNotHaveHeader(`x-fn-${String(num)}`);
 }
 
-function shouldNotHaveHeader(header) {
+export function shouldNotHaveHeader(header) {
   return res => {
     assert.ok(!(header.toLowerCase() in res.headers), `should not have header ${header}`);
   };

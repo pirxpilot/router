@@ -1,13 +1,7 @@
-const { it, describe } = require('node:test');
-const assert = require('node:assert/strict');
-const Router = require('..');
-const utils = require('./support/utils');
-
-const createHitHandle = utils.createHitHandle;
-const shouldHitHandle = utils.shouldHitHandle;
-const shouldNotHitHandle = utils.shouldNotHitHandle;
-const createServer = utils.createServer;
-const request = utils.request;
+import assert from 'node:assert/strict';
+import { describe, it } from 'node:test';
+import Router from '../index.js';
+import { createHitHandle, createServer, request, shouldHitHandle, shouldNotHitHandle } from './support/utils.js';
 
 describe('Router', () => {
   describe('.param(name, fn)', () => {

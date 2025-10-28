@@ -1,9 +1,6 @@
-const { it, describe } = require('node:test');
-const Router = require('..');
-const utils = require('./support/utils');
-
-const createServer = utils.createServer;
-const request = utils.request;
+import { describe, it } from 'node:test';
+import Router from '../index.js';
+import { createServer, request } from './support/utils.js';
 
 describe('OPTIONS', () => {
   it('should respond with defined routes', (_, done) => {

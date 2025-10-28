@@ -1,19 +1,18 @@
-const { it, describe } = require('node:test');
-const assert = require('node:assert/strict');
-const { METHODS } = require('node:http');
-const Router = require('..');
-const utils = require('./support/utils');
+import assert from 'node:assert/strict';
+import { METHODS } from 'node:http';
+import { describe, it } from 'node:test';
+import Router from '../index.js';
+import {
+  createHitHandle,
+  createServer,
+  request,
+  shouldHaveBody,
+  shouldHitHandle,
+  shouldNotHaveBody,
+  shouldNotHitHandle
+} from './support/utils.js';
 
 const methods = METHODS.map(m => m.toLowerCase());
-const createHitHandle = utils.createHitHandle;
-const createServer = utils.createServer;
-const request = utils.request;
-const shouldHaveBody = utils.shouldHaveBody;
-const shouldHitHandle = utils.shouldHitHandle;
-const shouldNotHaveBody = utils.shouldNotHaveBody;
-const shouldNotHitHandle = utils.shouldNotHitHandle;
-
-const describePromises = global.Promise ? describe : describe.skip;
 
 describe('Router', () => {
   describe('.route(path)', () => {
@@ -453,7 +452,7 @@ describe('Router', () => {
       });
     });
 
-    describePromises('promise support', () => {
+    describe('promise support', () => {
       it('should pass rejected promise value', (_, done) => {
         const router = new Router();
         const route = router.route('/foo');

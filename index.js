@@ -1,11 +1,11 @@
-const { METHODS } = require('node:http');
-const Layer = require('./lib/layer');
-const parseUrl = require('parseurl');
-const Route = require('./lib/route');
+import { METHODS } from 'node:http';
+import parseUrl from 'parseurl';
+import Layer from './lib/layer.js';
+import Route from './lib/route.js';
 
-module.exports = Router;
+export { Route };
 
-module.exports.Route = Route;
+Router.Route = Route;
 
 /**
  * Initialize a new `Router` with the given `options`.
@@ -15,7 +15,7 @@ module.exports.Route = Route;
  * @public
  */
 
-function Router(options) {
+export default function Router(options) {
   if (!(this instanceof Router)) {
     return new Router(options);
   }
@@ -42,7 +42,6 @@ function Router(options) {
  * Router prototype inherits from a Function.
  */
 
-/* istanbul ignore next */
 Router.prototype = () => {};
 
 /**
