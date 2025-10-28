@@ -15,12 +15,10 @@ Router.Route = Route;
  * @public
  */
 
-export default function Router(options) {
+export default function Router(options = {}) {
   if (!(this instanceof Router)) {
     return new Router(options);
   }
-
-  const opts = options || {};
 
   function router(req, res, next) {
     router.handle(req, res, next);
@@ -29,10 +27,10 @@ export default function Router(options) {
   // inherit from the correct prototype
   Object.setPrototypeOf(router, this);
 
-  router.caseSensitive = opts.caseSensitive;
-  router.mergeParams = opts.mergeParams;
+  router.caseSensitive = options.caseSensitive;
+  router.mergeParams = options.mergeParams;
   router.params = {};
-  router.strict = opts.strict;
+  router.strict = options.strict;
   router.stack = [];
 
   return router;

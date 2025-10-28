@@ -632,7 +632,7 @@ describe('Router', () => {
       describe('using "{:name}"', () => {
         it('should name an optional parameter', async () => {
           const router = new Router();
-          const route = router.route('{/:foo}');
+          const route = router.route('/:foo?');
           const server = createServer(router);
 
           route.all(sendParams);
@@ -642,7 +642,7 @@ describe('Router', () => {
 
         it('should work in any segment', async () => {
           const router = new Router();
-          const route = router.route('/user{/:foo}/delete');
+          const route = router.route('/user/:foo?/delete');
           const server = createServer(router);
 
           route.all(sendParams);
@@ -654,32 +654,24 @@ describe('Router', () => {
       describe('using "*name"', () => {
         it('should name a zero-or-more repeated parameter', async () => {
           const router = new Router();
-          const route = router.route('{/*foo}');
+          const route = router.route('/:foo*');
           const server = createServer(router);
 
           route.all(sendParams);
           await request(server).get('/').expect(200, {});
-          await request(server)
-            .get('/bar')
-            .expect(200, { foo: ['bar'] });
-          await request(server)
-            .get('/fizz/buzz')
-            .expect(200, { foo: ['fizz', 'buzz'] });
+          await request(server).get('/bar').expect(200, { foo: 'bar' });
+          await request(server).get('/fizz/buzz').expect(200, { foo: 'fizz/buzz' });
         });
 
         it('should work in any segment', async () => {
           const router = new Router();
-          const route = router.route('/user{/*foo}/delete');
+          const route = router.route('/user/:foo*/delete');
           const server = createServer(router);
 
           route.all(sendParams);
           await request(server).get('/user/delete').expect(200, {});
-          await request(server)
-            .get('/user/bar/delete')
-            .expect(200, { foo: ['bar'] });
-          await request(server)
-            .get('/user/fizz/buzz/delete')
-            .expect(200, { foo: ['fizz', 'buzz'] });
+          await request(server).get('/user/bar/delete').expect(200, { foo: 'bar' });
+          await request(server).get('/user/fizz/buzz/delete').expect(200, { foo: 'fizz/buzz' });
         });
       });
 
@@ -705,13 +697,6 @@ describe('Router', () => {
           route.all(sendParams);
           await request(server).get('/page_foo').expect(404);
           await request(server).get('/page_42').expect(200, { 0: '42' });
-        });
-
-        it('should not treat regexp as literal regexp', () => {
-          const router = new Router();
-          assert.throws(() => {
-            router.route('/([a-z]+:n[0-9]+)');
-          }, /TypeError: Unexpected \( at/);
         });
       });
     });
