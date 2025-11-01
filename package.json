@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.1",
-    "finalhandler": "~1",
+    "finalhandler": "~2",
     "supertest": "~7"
   },
   "files": [
