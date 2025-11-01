@@ -8,6 +8,7 @@ describe('using `:name`', () => {
 
     const m = match('/bar');
     assert.deepEqual(m.params, { foo: 'bar' });
+    assert.deepEqual(m.keys, ['foo']);
     assert.equal(m.path, '/bar');
   });
 
@@ -209,6 +210,7 @@ describe('using regular expression with param name "(?<name>pattern)"', () => {
     const m = match('/42');
     assert.deepEqual(m.params, { foo: '42' });
     assert.equal(m.path, '/42');
+    assert.deepEqual(m.keys, ['foo']);
   });
 });
 
