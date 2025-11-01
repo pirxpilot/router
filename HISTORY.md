@@ -1,4 +1,14 @@
 
+2.0.0 / 2025-11-01
+==================
+
+ * use URL Pattern API instead of `path-to-regexp` - that changes the accepted syntax of URL patterns
+ * transition to ESM format
+ * make matcher calculate `keys` property
+ * upgrade `finalhandler` to ~2
+ * use biome as a linter and formatter
+ * update github actions
+
 1.1.0 / 2025-01-18
 ==================
 
