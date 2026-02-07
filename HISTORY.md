@@ -1,4 +1,9 @@
 
+2.0.1 / 2026-02-06
+==================
+
+ * process named parameters in the order they are declared in the URL pattern
+
 2.0.0 / 2025-11-01
 ==================
 
