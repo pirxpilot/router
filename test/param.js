@@ -325,6 +325,31 @@ describe('Router', () => {
           .expect('get user bob 2 times: user, bob', done);
       });
     });
+
+    it('should call param callbacks in order of appearance in pattern', (_, done) => {
+      const router = new Router();
+      const server = createServer(router);
+      const callOrder = [];
+
+      router.param('user', function parseUser(req, _res, next, user) {
+        callOrder.push('user');
+        req.user = user;
+        next();
+      });
+
+      router.param('book', function parseBook(req, _res, next, book) {
+        callOrder.push('book');
+        req.book = book;
+        next();
+      });
+
+      router.get('/user/:user/book/:book', (req, res) => {
+        res.setHeader('Content-Type', 'text/plain');
+        res.end(`user: ${req.user}, book: ${req.book}, order: ${callOrder.join(',')}`);
+      });
+
+      request(server).get('/user/john/book/1984').expect('user: john, book: 1984, order: user,book', done);
+    });
   });
 });
 
