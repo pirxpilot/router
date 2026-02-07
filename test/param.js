@@ -326,29 +326,30 @@ describe('Router', () => {
       });
     });
 
-    it('should call param callbacks in order of appearance in pattern', (_, done) => {
+    it('should call param callbacks in order of appearance in pattern', async () => {
       const router = new Router();
       const server = createServer(router);
-      const callOrder = [];
 
       router.param('user', function parseUser(req, _res, next, user) {
-        callOrder.push('user');
-        req.user = user;
+        req.text ??= '';
+        req.text += user;
         next();
       });
 
       router.param('book', function parseBook(req, _res, next, book) {
-        callOrder.push('book');
-        req.book = book;
+        req.text ??= '';
+        req.text += book;
         next();
       });
 
-      router.get('/user/:user/book/:book', (req, res) => {
+      router.get('/user/:user?/book/:book', (req, res) => {
         res.setHeader('Content-Type', 'text/plain');
-        res.end(`user: ${req.user}, book: ${req.book}, order: ${callOrder.join(',')}`);
+        res.end(req.text);
       });
 
-      request(server).get('/user/john/book/1984').expect('user: john, book: 1984, order: user,book', done);
+      await request(server).get('/user/john/book/1984').expect('john1984');
+      await request(server).get('/user/ada/book/2004').expect('ada2004');
+      await request(server).get('/user/book/no-user').expect('no-user');
     });
   });
 });
